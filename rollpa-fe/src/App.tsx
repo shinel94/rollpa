@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+// import React, { useState, useEffect, useRef } from 'react';
 import Modal from 'react-modal';
-import CanvasDraw from 'react-canvas-draw';
+// import CanvasDraw from 'react-canvas-draw';
 import PaintModal from './Paint';
 
 Modal.setAppElement('#root');
@@ -18,7 +19,7 @@ const App: React.FC = () => {
   const [newGridKey, setNewGridKey] = useState('');
   const [newGridTitle, setNewGridTitle] = useState('');
   const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
-  const canvasRef = useRef<CanvasDraw | null>(null);
+  // const canvasRef = useRef<CanvasDraw | null>(null);
 
   useEffect(() => {
     fetch(`${API_URL}/grids`)
