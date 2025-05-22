@@ -11,3 +11,7 @@
     background-color: rgba(168, 180, 244, 0.472);
     color: white;
 }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
