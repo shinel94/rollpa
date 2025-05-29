@@ -1,50 +1,32 @@
 // The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work.
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Grid from "./components/Grid";
 import Footer from "./layout/footer";
 import LoginModal from "./components/modal/loginModal";
+import { getGridCellInfo, getGridInfo, postSaveCell } from "./api/grid";
+import type { Cell, GridInfo } from "./def/type";
+import PaintModal from "./components/Paint";
+
+
 const App: React.FC = () => {
-  const [selectedCell, setSelectedCell] = useState<number | null>(null);
+  const [grids, setGrids] = useState<GridInfo[]>([]);
+  const [selectedGrid, setSelectedGrid] = useState<GridInfo | undefined>(undefined);
+  const [cells, setCells] = useState<Cell[]>([]);
+  const [selectedCell, setSelectedCell] = useState<Cell | undefined>(undefined);
+  const [drawModalOpen, setDrawModalOpen] = useState(false);
+
   const [messageType, setMessageType] = useState<string>("all");
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("grid");
-  // Grid data
-  const totalCells = 10000; // 100x100 grid
-  const filledCells = 6732;
-  const completionPercentage = Math.floor((filledCells / totalCells) * 100);
-  // Generate sample grid data
-  const generateGridData = () => {
-    const statuses = ["available", "reserved", "filled"];
-    const types = ["birthday", "encouragement", "anniversary", "general"];
-    return Array.from({ length: 100 }, (_, rowIndex) =>
-      Array.from({ length: 100 }, (_, colIndex) => {
-        const random = Math.random();
-        let status = "available";
-        if (random < 0.67) {
-          status = "filled";
-        } else if (random < 0.75) {
-          status = "reserved";
-        }
-        return {
-          id: rowIndex * 100 + colIndex,
-          status,
-          type: types[Math.floor(Math.random() * types.length)],
-          likes: Math.floor(Math.random() * 50),
-          username:
-            status === "filled"
-              ? `fan${Math.floor(Math.random() * 1000)}`
-              : null,
-        };
-      }),
-    );
-  };
-  const gridData = generateGridData();
-  // Flatten grid data for easier filtering
-  const flatGridData = gridData.flat();
-  const handleCellClick = (cellId: number) => {
-    setSelectedCell(cellId);
+
+
+
+  const handleCellClick = (cell: Cell) => {
+    if (cell.owner_id) return;
+    setSelectedCell(cell);
+    setDrawModalOpen(true);
   };
   const handleZoomIn = () => {
     if (zoomLevel < 3) setZoomLevel(zoomLevel + 0.5);
@@ -66,12 +48,49 @@ const App: React.FC = () => {
   const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setMessageType(e.target.value);
   };
-  const filteredCellCount =
-    messageType === "all"
-      ? filledCells
-      : flatGridData.filter(
-          (cell) => cell.status === "filled" && cell.type === messageType,
-        ).length;
+
+  const handleSave = async (dataUrl: string) => {
+    if (!selectedCell) return;
+
+    try {
+      postSaveCell(selectedCell.id, dataUrl).then(
+        (updated) => {
+          if (updated) {
+            setCells(prev => prev.map(c => c.id === updated.id ? updated : c));
+            setDrawModalOpen(false);
+          }
+        }
+      );
+
+    } catch (err) { console.error(err); }
+  };
+
+  const filledCellCount = useMemo<number>(() => {
+    return cells.filter((cell) => !!cell.content).length
+  }, [cells])
+
+  const completionPercentage = useMemo(() => {
+
+    if (selectedGrid) {
+      return Math.floor(filledCellCount / (selectedGrid.sideLength * selectedGrid.sideLength) * 100);
+    }
+
+  }, [selectedGrid, filledCellCount])
+
+  useEffect(() => {
+    getGridInfo().then((data) => {
+      setGrids(data);
+      if (data.length) setSelectedGrid(data[0]);
+    })
+  }, [])
+
+  useEffect(() => {
+    if (selectedGrid) {
+      getGridCellInfo(selectedGrid.key).then((data) => {
+        setCells(data)
+      })
+    }
+  }, [selectedGrid])
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-pink-50">
       {/* Header */}
@@ -151,44 +170,40 @@ const App: React.FC = () => {
         <div className="flex border-b border-gray-200">
           <button
             onClick={() => setActiveTab("grid")}
-            className={`px-4 py-2 font-medium text-sm mr-4 cursor-pointer whitespace-nowrap ${
-              activeTab === "grid"
-                ? "text-purple-600 border-b-2 border-purple-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
+            className={`px-4 py-2 font-medium text-sm mr-4 cursor-pointer whitespace-nowrap ${activeTab === "grid"
+              ? "text-purple-600 border-b-2 border-purple-600"
+              : "text-gray-500 hover:text-gray-700"
+              }`}
           >
             <i className="fas fa-th mr-2"></i>
             Message Grid
           </button>
           <button
             onClick={() => setActiveTab("pixel")}
-            className={`px-4 py-2 font-medium text-sm mr-4 cursor-pointer whitespace-nowrap ${
-              activeTab === "pixel"
-                ? "text-purple-600 border-b-2 border-purple-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
+            className={`px-4 py-2 font-medium text-sm mr-4 cursor-pointer whitespace-nowrap ${activeTab === "pixel"
+              ? "text-purple-600 border-b-2 border-purple-600"
+              : "text-gray-500 hover:text-gray-700"
+              }`}
           >
             <i className="fas fa-pencil-alt mr-2"></i>
             Pixel Editor
           </button>
           <button
             onClick={() => setActiveTab("preview")}
-            className={`px-4 py-2 font-medium text-sm mr-4 cursor-pointer whitespace-nowrap ${
-              activeTab === "preview"
-                ? "text-purple-600 border-b-2 border-purple-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
+            className={`px-4 py-2 font-medium text-sm mr-4 cursor-pointer whitespace-nowrap ${activeTab === "preview"
+              ? "text-purple-600 border-b-2 border-purple-600"
+              : "text-gray-500 hover:text-gray-700"
+              }`}
           >
             <i className="fas fa-eye mr-2"></i>
             Preview Mosaic
           </button>
           <button
             onClick={() => setActiveTab("stats")}
-            className={`px-4 py-2 font-medium text-sm cursor-pointer whitespace-nowrap ${
-              activeTab === "stats"
-                ? "text-purple-600 border-b-2 border-purple-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
+            className={`px-4 py-2 font-medium text-sm cursor-pointer whitespace-nowrap ${activeTab === "stats"
+              ? "text-purple-600 border-b-2 border-purple-600"
+              : "text-gray-500 hover:text-gray-700"
+              }`}
           >
             <i className="fas fa-chart-bar mr-2"></i>
             Project Stats
@@ -304,21 +319,28 @@ const App: React.FC = () => {
           </div>
           {/* Main Content - Grid */}
           <div className="lg:w-2/4">
-            <Grid 
+            {selectedGrid ? <Grid
               handleZoomOut={handleZoomOut}
               zoomLevel={zoomLevel}
               handleZoomIn={handleZoomIn}
-              gridData={gridData}
+              gridData={cells}
               handleCellClick={handleCellClick}
               selectedCell={selectedCell}
               completionPercentage={completionPercentage}
               messageType={messageType}
               handleFilterChange={handleFilterChange}
-              filteredCellCount={filteredCellCount}
-              totalCells={totalCells}
+              filteredCellCount={filledCellCount}
+              totalCells={selectedGrid.sideLength * selectedGrid.sideLength}
+              sideLength={selectedGrid.sideLength}
+            /> : <div></div>}
+            <PaintModal
+              isOpen={drawModalOpen}
+              initialData={selectedCell?.content}
+              onSave={handleSave}
+              onClose={() => setDrawModalOpen(false)}
             />
             {/* Selected Cell Details */}
-            {selectedCell !== null && (
+            {/* {selectedCell !== null && (
               <div className="bg-white rounded-xl shadow-lg p-6">
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="text-lg font-bold text-gray-800">
@@ -432,7 +454,7 @@ const App: React.FC = () => {
                   </div>
                 )}
               </div>
-            )}
+            )} */}
           </div>
           {/* Right Sidebar - Pixel Editor */}
           <div className="lg:w-1/4">
@@ -604,7 +626,7 @@ const App: React.FC = () => {
       </main>
       {/* Login Modal */}
       {showLoginModal && (
-        <LoginModal handleCloseLoginModal={handleCloseLoginModal} handleLoginSubmit={handleLoginSubmit}/>
+        <LoginModal handleCloseLoginModal={handleCloseLoginModal} handleLoginSubmit={handleLoginSubmit} />
       )}
       <Footer />
     </div>

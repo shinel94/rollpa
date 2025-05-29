@@ -23,7 +23,7 @@ const PaintModal: React.FC<PaintProps> = ({ isOpen, initialData, onSave, onClose
     //   console.log('[PaintModal] Received export, calling onSave');
     //   onSave(e.data.dataUrl);
     // }
-  // }, [onSave]);
+    // }, [onSave]);
   }, []);
 
   useEffect(() => {
@@ -35,6 +35,7 @@ const PaintModal: React.FC<PaintProps> = ({ isOpen, initialData, onSave, onClose
   const handleIframeLoad = () => {
     console.log('[PaintModal] Iframe loaded');
     if (iframeRef.current && initialData) {
+      console.log('test')
       const win = iframeRef.current.contentWindow;
       const message = { type: 'piskel-import', data: initialData };
       console.log('[PaintModal] Sending import to iframe');
@@ -52,7 +53,7 @@ const PaintModal: React.FC<PaintProps> = ({ isOpen, initialData, onSave, onClose
 
   // Send export command
   const handleSaveClick = () => {
-    if (image){
+    if (image) {
       onSave(image);
     }
     // console.log('[PaintModal] Sending export request to iframe');

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 // import React, { useState, useEffect, useRef } from 'react';
 import Modal from 'react-modal';
 // import CanvasDraw from 'react-canvas-draw';
-import PaintModal from './Paint';
+import PaintModal from './components/Paint';
 
 Modal.setAppElement('#root');
 const API_URL = 'http://localhost:8000';
@@ -62,7 +62,7 @@ const App: React.FC = () => {
 
   const handleSave = async (dataUrl: string) => {
     if (!selectedCell) return;
-  
+
     try {
       const res = await fetch(
         `${API_URL}/cells/${selectedCell.id}/draw`,
@@ -87,8 +87,8 @@ const App: React.FC = () => {
           <button onClick={() => setCreateModalOpen(true)} style={{ marginLeft: 8 }}>Create Grid</button>
         </div>
       </header>
-      <div style={{display: 'flex' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(20, 32px)', gap: '0px', marginTop: 16, border: '1px solid #ccc'}}>
+      <div style={{ display: 'flex' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(20, 32px)', gap: '0px', marginTop: 16, border: '1px solid #ccc' }}>
           {cells.map(cell => (
             <div
               key={cell.id}
@@ -115,7 +115,7 @@ const App: React.FC = () => {
         <button onClick={handleCreateGrid} style={{ marginRight: 8 }}>Create</button>
         <button onClick={() => setCreateModalOpen(false)}>Cancel</button>
       </Modal>
-        
+
       <PaintModal
         isOpen={drawModalOpen}
         initialData={selectedCell?.content}
