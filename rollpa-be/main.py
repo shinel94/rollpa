@@ -20,6 +20,7 @@ class User(SQLModel, table=True):
 class Grid(SQLModel, table=True):
     key: str = Field(primary_key=True, index=True)
     title: str
+    side_length: int = Field(default=20, nullable=False)
 
 class Cell(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
