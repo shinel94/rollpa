@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -8,7 +9,7 @@
   <meta name="author" content="Julian Descottes">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script>
-    (function() {
+    (function () {
       function setupMessageBridge() {
         // pskl.app.core.MainController 가 준비되었는지 확인
         // console.log('load event function')
@@ -22,7 +23,7 @@
         if (
           window.pskl &&
           window.pskl.app &&
-          window.pskl.utils && 
+          window.pskl.utils &&
           window.pskl.utils.CanvasUtils
         ) {
           // const el = document.getElementById(`drawer-container`)
@@ -41,21 +42,22 @@
           ['drawer-container', 'preview-list-wrapper'].forEach(elId => {
             // data-action 속성으로 버튼 찾기
             const el = document.getElementById(elId)
-            console.log(el)
             if (el) {
               // 완전히 DOM에서 제거
               el.remove();
               // 또는 el.style.display = 'none';
             }
           });
-          
 
-          window.addEventListener('message', function(e) {
+
+          window.addEventListener('message', function (e) {
             // import
+            const data = e.data
+            console.log(data)
             if (e.data?.type === 'piskel-import' && e.data.data) {
               img = new Image();
               img.src = e.data.data;
-              img.onload = function() {
+              img.onload = function () {
                 console.log('loaded')
                 // 2. ImportService 인스턴스 생성
                 var importer = new window.pskl.service.ImportService();
@@ -67,7 +69,7 @@
                   img.height           // 캔버스 높이
                 );
                 // 이제 새로 생성된 Piskel이 에디터에 로드됩니다.
-                pskl.app.piskelController.setPiskel(piskel); 
+                pskl.app.piskelController.setPiskel(piskel);
               };
               // console.log(e.data.data);
               // console.log(window.pskl.utils.serialization.Deserializer(e.data.data));
@@ -92,7 +94,7 @@
           setTimeout(setupMessageBridge, 100);
         }
       }
-  
+
       // 페이지가 완전히 로드된 이후에 브릿지 설정 시작
       window.addEventListener('load', () => {
         setupMessageBridge();
@@ -100,10 +102,9 @@
     })();
   </script>
 </head>
+
 <body>
-  <div
-    id="loading-mask"
-    style="
+  <div id="loading-mask" style="
     position:fixed;
     top:0;right:0;bottom:0;left:0;
     background:black;
@@ -112,7 +113,7 @@
     z-index : 20000;
     transition:opacity 0.5s;
     color:white;">
-      <span style="top:45%">Loading Piskel ...</span>
+    <span style="top:45%">Loading Piskel ...</span>
   </div>
   <!--<style type="text/css">
   #main-wrapper {
@@ -170,38 +171,38 @@
   <!--body-main-start-->
   <div id="main-wrapper" class="main-wrapper">
     <div class="sticky-section left-sticky-section" id="tool-section">
-  <div class="sticky-section-wrap">
-    <div class="vertical-centerer">
-      <div id="pen-size-container">
-        <!-- Content comes from PenSizeController createPenSizeDom_() -->
+      <div class="sticky-section-wrap">
+        <div class="vertical-centerer">
+          <div id="pen-size-container">
+            <!-- Content comes from PenSizeController createPenSizeDom_() -->
+          </div>
+          <ul id="tools-container" class="tools-wrapper">
+            <!-- Drawing tools will be inserted here -->
+          </ul>
+          <div class="palette-wrapper" id="palette-wrapper">
+            <!-- Content comes from PaletteController createExportDom_() -->
+          </div>
+        </div>
       </div>
-      <ul id="tools-container" class="tools-wrapper">
-        <!-- Drawing tools will be inserted here -->
-      </ul>
-      <div class="palette-wrapper" id="palette-wrapper">
-        <!-- Content comes from PaletteController createExportDom_() -->
-      </div>
-    </div>
-  </div>
 
-  <!-- Templates -->
+      <!-- Templates -->
 
-  <!-- Drawing tool icon-button -->
-  <script type="text/template" id="drawingTool-item-template">
+      <!-- Drawing tool icon-button -->
+      <script type="text/template" id="drawingTool-item-template">
     <li rel="tooltip" data-placement="{{tooltipposition}}" class="{{cssclass}}" data-tool-id="{{toolid}}" title="{{title}}"></li>
   </script>
-</div>
+    </div>
 
 
     <div id="column-wrapper" class="column-wrapper">
       <div class='column left-column'>
         <div id="preview-list-wrapper" class="preview-list-wrapper">
-  <div id="preview-list-scroller" class="preview-list-scroller">
-    <ul class="preview-list" id="preview-list"></ul>
-  </div>
-  <div class="top-overflow"></div>
-  <div class="bottom-overflow"></div>
-</div>
+          <div id="preview-list-scroller" class="preview-list-scroller">
+            <ul class="preview-list" id="preview-list"></ul>
+          </div>
+          <div class="top-overflow"></div>
+          <div class="bottom-overflow"></div>
+        </div>
       </div>
 
       <div class='column main-column'>
@@ -212,68 +213,59 @@
 
       <div class="column right-column">
         <div id="animated-preview-container" class="preview-container">
-  <div class="canvas-container-wrapper minimap-container">
-    <div class="preview-contextual-actions">
-      <div class="preview-drop-down">
-        <div class="preview-disable-overlay" rel="tooltip" data-placement="left"></div>
-        <div class="preview-contextual-action  original-size-button" rel="tooltip" data-placement="left">1x</div>
-        <div class="preview-contextual-action  best-size-button" rel="tooltip" data-placement="left"></div>
-        <div class="preview-contextual-action  full-size-button" rel="tooltip" data-placement="left">Full</div>
-      </div>
-      <div class="preview-contextual-action  open-popup-preview-button  icon-minimap-popup-preview-arrow-white"
-           title="Open preview in popup" rel="tooltip" data-placement="bottom"></div>
-    </div>
+          <div class="canvas-container-wrapper minimap-container">
+            <div class="preview-contextual-actions">
+              <div class="preview-drop-down">
+                <div class="preview-disable-overlay" rel="tooltip" data-placement="left"></div>
+                <div class="preview-contextual-action  original-size-button" rel="tooltip" data-placement="left">1x
+                </div>
+                <div class="preview-contextual-action  best-size-button" rel="tooltip" data-placement="left"></div>
+                <div class="preview-contextual-action  full-size-button" rel="tooltip" data-placement="left">Full</div>
+              </div>
+              <div class="preview-contextual-action  open-popup-preview-button  icon-minimap-popup-preview-arrow-white"
+                title="Open preview in popup" rel="tooltip" data-placement="bottom"></div>
+            </div>
 
-    <div id="animated-preview-canvas-container" class="canvas-container">
-      <div class="canvas-background"></div>
-    </div>
-  </div>
-  <div>
-    <div rel="tooltip"
-         data-placement="bottom"
-         class="piskel-icon-onion preview-toggle-onion-skin"></div>
-    <span id="display-fps" class="display-fps"></span>
-    <input id="preview-fps" class="range-fps" type="range" min="0" max="24"/>
-  </div>
-  <div>
-  </div>
-</div>
+            <div id="animated-preview-canvas-container" class="canvas-container">
+              <div class="canvas-background"></div>
+            </div>
+          </div>
+          <div>
+            <div rel="tooltip" data-placement="bottom" class="piskel-icon-onion preview-toggle-onion-skin"></div>
+            <span id="display-fps" class="display-fps"></span>
+            <input id="preview-fps" class="range-fps" type="range" min="0" max="24" />
+          </div>
+          <div>
+          </div>
+        </div>
         <div class="toolbox-container layers-list-container">
-  <h3 class="toolbox-title layers-title">Layers
-    <div rel="tooltip"
-         data-placement="left"
-         class="layers-toggle-preview piskel-icon-eye"></div>
-  </h3>
-  <div class="toolbox-buttons">
-    <button data-action="add"
-      class="button layers-button piskel-icon-plus"
-      rel="tooltip" data-placement="top" ></button>
+          <h3 class="toolbox-title layers-title">Layers
+            <div rel="tooltip" data-placement="left" class="layers-toggle-preview piskel-icon-eye"></div>
+          </h3>
+          <div class="toolbox-buttons">
+            <button data-action="add" class="button layers-button piskel-icon-plus" rel="tooltip"
+              data-placement="top"></button>
 
-    <button data-action="up"
-      class="button layers-button piskel-icon-arrow-up-fat"
-      title="Move layer up" rel="tooltip" data-placement="top" ></button>
+            <button data-action="up" class="button layers-button piskel-icon-arrow-up-fat" title="Move layer up"
+              rel="tooltip" data-placement="top"></button>
 
-    <button data-action="down"
-      class="button layers-button piskel-icon-arrow-down-fat"
-      title="Move layer down" rel="tooltip" data-placement="top" ></button>
+            <button data-action="down" class="button layers-button piskel-icon-arrow-down-fat" title="Move layer down"
+              rel="tooltip" data-placement="top"></button>
 
-    <button data-action="edit"
-      class="button layers-button piskel-icon-pencil"
-      title="Edit layer name" rel="tooltip" data-placement="top"></button>
+            <button data-action="edit" class="button layers-button piskel-icon-pencil" title="Edit layer name"
+              rel="tooltip" data-placement="top"></button>
 
-    <button data-action="merge"
-      class="button layers-button piskel-icon-merge"
-      title="Merge with layer below" rel="tooltip" data-placement="top" ></button>
+            <button data-action="merge" class="button layers-button piskel-icon-merge" title="Merge with layer below"
+              rel="tooltip" data-placement="top"></button>
 
-    <button data-action="delete"
-      class="button layers-button piskel-icon-close"
-      title="Delete selected layer" rel="tooltip" data-placement="top" ></button>
+            <button data-action="delete" class="button layers-button piskel-icon-close" title="Delete selected layer"
+              rel="tooltip" data-placement="top"></button>
 
-  </div>
+          </div>
 
-  <ul class="layers-list"></ul>
+          <ul class="layers-list"></ul>
 
-  <script type="text/template" id="layer-item-template">
+          <script type="text/template" id="layer-item-template">
     <li class="layer-item {{isselected:current-layer-item}}"
         data-layer-index="{{layerindex}}">
         <span class="layer-name" data-placement="top">{{layername}}</span>
@@ -283,32 +275,27 @@
         </span>
     </li>
   </script>
-</div>
+        </div>
 
         <div class="toolbox-container transformations-container">
-  <h3 class="toolbox-title transformations-title">
-    Transform
-    <span
-      class="transformations-show-more-link piskel-icon-plus"
-      title="View more tools"
-      rel="tooltip" data-placement="top"
-    ></span>
-  </h3>
-  <ul class="tools-wrapper"></ul>
-</div>
+          <h3 class="toolbox-title transformations-title">
+            Transform
+            <span class="transformations-show-more-link piskel-icon-plus" title="View more tools" rel="tooltip"
+              data-placement="top"></span>
+          </h3>
+          <ul class="tools-wrapper"></ul>
+        </div>
         <div class="toolbox-container palettes-list-container">
-  <h3 class="toolbox-title palettes-title">Palettes</h3>
-  <div class="toolbox-buttons">
-    <button
-      class="button palettes-list-button create-palette-button piskel-icon-plus" data-action="add"
-      title="Create a new palette" rel="tooltip" data-placement="top" ></button>
-    <select class="button palettes-list-select"></select>
-    <button
-      class="button palettes-list-button edit-palette-button  piskel-icon-pencil" data-action="edit"
-      title="Manage this palette" rel="tooltip" data-placement="top"></button>
-  </div>
-  <div class="palettes-list-colors"></div>
-  <script type="text/template" id="palette-color-template">
+          <h3 class="toolbox-title palettes-title">Palettes</h3>
+          <div class="toolbox-buttons">
+            <button class="button palettes-list-button create-palette-button piskel-icon-plus" data-action="add"
+              title="Create a new palette" rel="tooltip" data-placement="top"></button>
+            <select class="button palettes-list-select"></select>
+            <button class="button palettes-list-button edit-palette-button  piskel-icon-pencil" data-action="edit"
+              title="Manage this palette" rel="tooltip" data-placement="top"></button>
+          </div>
+          <div class="palettes-list-colors"></div>
+          <script type="text/template" id="palette-color-template">
     <div class="palettes-list-color"
          data-color="{{color}}"
          data-color-index="{{index}}"
@@ -317,13 +304,13 @@
     </div>
   </script>
 
-  <script type="text/template" id="palettes-list-no-colors-partial">
+          <script type="text/template" id="palettes-list-no-colors-partial">
     <div class="palettes-list-no-colors">
       No color in the selected palette ...
     </div>
   </script>
 
-</div>
+        </div>
 
 
 
@@ -334,8 +321,8 @@
     <div id="application-action-section" data-pskl-controller="settings" class="sticky-section right-sticky-section">
       <div class="sticky-section-wrap">
         <div class="vertical-centerer" id="settings-vertical-centerer">
-  <!-- Content comes from SettingsController createSettingsDom_() -->
-</div>
+          <!-- Content comes from SettingsController createSettingsDom_() -->
+        </div>
         <div class="drawer vertical-centerer">
           <div class="drawer-content" id="drawer-container">
           </div>
@@ -350,7 +337,7 @@
   </div>
 
   <div style="display:none">
-  <script type="text/template" id="progress-bar-template">
+    <script type="text/template" id="progress-bar-template">
     <div class="progress-bar-container">
       <div class="progress-bar-name">{{name}}</div>
       <div class="progress-bar-item progress-bar"></div>
@@ -358,33 +345,33 @@
     </div>
   </script>
 
-  <!-- Tooltip container -->
-  <script type="text/template" id="tooltip-container-template">
+    <!-- Tooltip container -->
+    <script type="text/template" id="tooltip-container-template">
     <div class='tooltip-container'>
       <div>{{helptext}} <span class='tooltip-shortcut'>{{shortcut}}</span></div>
       {{!descriptors!}}
     </div>
   </script>
 
-  <!-- Tooltip description with modifier -->
-  <script type="text/template" id="tooltip-modifier-descriptor-template">
+    <!-- Tooltip description with modifier -->
+    <script type="text/template" id="tooltip-modifier-descriptor-template">
     <div class='tooltip-descriptor'>
       <span class='tooltip-descriptor-button'>{{key}}</span>
       {{description}}
     </div>
   </script>
 
-  <!-- Simple tooltip description -->
-  <script type="text/template" id="tooltip-simple-descriptor-template">
+    <!-- Simple tooltip description -->
+    <script type="text/template" id="tooltip-simple-descriptor-template">
     <div class='tooltip-descriptor'>
       {{description}}
     </div>
   </script>
 
-  <!-- ----------------------------------------------------------- -->
-  <!-- Settings -->
-  <!-- Template for Settings Options -->
-  <script type="text/template" id="settings-options-template">
+    <!-- ----------------------------------------------------------- -->
+    <!-- Settings -->
+    <!-- Template for Settings Options -->
+    <script type="text/template" id="settings-options-template">
     <div
       data-setting="{{dataSetting}}"
       class="tool-icon {{iconSetting}}"
@@ -393,10 +380,10 @@
     </div>  
   </script>
 
-  <!-- ----------------------------------------------------------- -->
-  <!-- Color Palette Tool -->
-  <!-- Template for Primary and Secondary Color -->
-  <script type="text/template" id="color-palette-primary-secondary-template">
+    <!-- ----------------------------------------------------------- -->
+    <!-- Color Palette Tool -->
+    <!-- Template for Primary and Secondary Color -->
+    <script type="text/template" id="color-palette-primary-secondary-template">
     <div
       class="tool-icon tool-color-picker"
       data-initial-title="{{title}}"
@@ -407,8 +394,8 @@
     </div>
   </script>
 
-  <!-- Template for Primary and Secondary Color -->
-  <script type="text/template" id="color-palette-swap-template">
+    <!-- Template for Primary and Secondary Color -->
+    <script type="text/template" id="color-palette-swap-template">
     <div
       class="swap-colors-button icon-common-swapcolors-arrow-grey"
       title="{{title}}"
@@ -416,11 +403,11 @@
       data-placement="right"
     ></div>
   </script>
-  
-  <!-- ----------------------------------------------------------- -->
-  <!-- Change Pen Size Tool -->
-  <!-- Template for change pen size -->
-  <script type="text/template" id="change-pen-size-template">
+
+    <!-- ----------------------------------------------------------- -->
+    <!-- Change Pen Size Tool -->
+    <!-- Template for change pen size -->
+    <script type="text/template" id="change-pen-size-template">
     <div class="pen-size-container size-picker-container" title="{{title}}" rel="tooltip" data-placement="top">
       <div class="pen-size-option size-picker-option" data-size="1"></div>
       <div class="pen-size-option size-picker-option" data-size="4"></div>
@@ -429,15 +416,15 @@
     </div>
   </script>
 
-  <!-- ----------------------------------------------------------- -->
-  <!-- Resize Tool -->
-  <!-- Template for Resize Settings Title -->
-  <script type="text/template" id="resize-settings-template">
+    <!-- ----------------------------------------------------------- -->
+    <!-- Resize Tool -->
+    <!-- Template for Resize Settings Title -->
+    <script type="text/template" id="resize-settings-template">
     {{title}}
   </script>
 
-  <!-- Template for Width and Height -->
-  <script type="text/template" id="resize-tool-template">
+    <!-- Template for Width and Height -->
+    <script type="text/template" id="resize-tool-template">
     <div class="resize-section">
       <span class="resize-section-title">{{label}}</span>
       <input type="text" class="textfield resize-size-field" autocomplete="off" name="{{inputName}}"/>
@@ -445,8 +432,8 @@
     </div>
   </script>
 
-  <!-- Template for Ratio and Canvas -->
-  <script type="text/template" id="ratio-canvas-template">
+    <!-- Template for Ratio and Canvas -->
+    <script type="text/template" id="ratio-canvas-template">
     <div class="resize-section">
       <label class="checkbox-container">
         <input type="checkbox" class="{{cssClass}} checkbox-fix" value="true"/>
@@ -455,30 +442,30 @@
     </div>
   </script>
 
-  <!-- Template for Anchor -->
-  <script type="text/template" id="resize-anchor-template">
+    <!-- Template for Anchor -->
+    <script type="text/template" id="resize-anchor-template">
     <div class="resize-section">
       <span class="resize-section-title">{{title}}</span>
       <div class="resize-anchor-container"></div>
     </div>
   </script>
 
-  <!-- Template for Resize Submit Button -->
-  <script type="text/template" id="resize-button-template">
+    <!-- Template for Resize Submit Button -->
+    <script type="text/template" id="resize-button-template">
     <input type="submit" class="button button-primary resize-button" value="{{valueText}}" />
   </script>
 
-  <!-- ----------------------------------------------------------- -->
-  <!-- Export Tool -->
-  <!-- Template for Export Settings Title -->
-  <script type="text/template" id="export-settings-template">
+    <!-- ----------------------------------------------------------- -->
+    <!-- Export Tool -->
+    <!-- Template for Export Settings Title -->
+    <script type="text/template" id="export-settings-template">
     <div class="settings-title" id="settings-title">
       {{text}}
     </div>
   </script>
 
-   <!-- Template for Scale Changing -->
-   <script type="text/template" id="export-scale-template">
+    <!-- Template for Scale Changing -->
+    <script type="text/template" id="export-scale-template">
     <div class="settings-item export-scale" title="{{tooltipTitle}}"
         rel="tooltip"
         data-placement="top"
@@ -489,8 +476,8 @@
     </div>
   </script>
 
-  <!-- Template for Change Resolution -->
-  <script type="text/template" id="export-change-resolution-template">
+    <!-- Template for Change Resolution -->
+    <script type="text/template" id="export-change-resolution-template">
     <div class="settings-item export-resize" id="export-resize">
       <span class="resize-label">{{label}}</span>
       <input type="text" class="textfield  resize-field  resize-width" autocomplete="off" name="resize-width"/>
@@ -499,8 +486,8 @@
     </div>
   </script>
 
-  <!-- Template for Export Tabs -->
-  <script type="text/template" id="export-tabs-template">
+    <!-- Template for Export Tabs -->
+    <script type="text/template" id="export-tabs-template">
     <div class="export-tabs tab-list" id="tab-list">
       <div class="export-tab tab-item" data-tab-id="gif">GIF</div>
       <div class="export-tab tab-item" data-tab-id="png">PNG</div>
@@ -509,15 +496,15 @@
     </div>
   </script>
 
-  <!-- ----------------------------------------------------------- -->
-  <!-- Zip Export Tool -->
-  <!-- Template for Zip Export Desc -->
-  <script type="text/template" id="zip-export-desc-template">
+    <!-- ----------------------------------------------------------- -->
+    <!-- Zip Export Tool -->
+    <!-- Template for Zip Export Desc -->
+    <script type="text/template" id="zip-export-desc-template">
     {{description}}
   </script>
 
-  <!-- Template for Zip Export Prefix -->
-  <script type="text/template" id="zip-export-prefix-template">
+    <!-- Template for Zip Export Prefix -->
+    <script type="text/template" id="zip-export-prefix-template">
     <div style="display: flex; line-height: 23px;">
       <label style="flex-shrink: 0; padding-right:5px;">{{label}}</label>
       <input type="text" style="flex: 1;" class="zip-prefix-name textfield"
@@ -525,36 +512,36 @@
     </div>
   </script>
 
-  <!-- Template for Zip Export Split By Layers -->
-  <script type="text/template" id="zip-export-layers-template">
+    <!-- Template for Zip Export Split By Layers -->
+    <script type="text/template" id="zip-export-layers-template">
     <div class="checkbox-container" style="margin: 5px 0;">
       <input id="zip-split-layers" class="zip-split-layers-checkbox checkbox-fix" type="checkbox" />
       <label for="zip-split-layers">{{label}}</label>
     </div>
   </script>
 
-  <!-- Template for Zip Export Download Button -->
-  <script type="text/template" id="zip-export-download-button-template">
+    <!-- Template for Zip Export Download Button -->
+    <script type="text/template" id="zip-export-download-button-template">
     <button type="button" class="button button-primary zip-generate-button">{{buttonText}}</button>
   </script>
-  
-  <!-- ----------------------------------------------------------- -->
-  <!-- Gif Export Tool -->
-  <!-- Template for Gif Export Desc -->
-  <script type="text/template" id="gif-export-desc-template">
+
+    <!-- ----------------------------------------------------------- -->
+    <!-- Gif Export Tool -->
+    <!-- Template for Gif Export Desc -->
+    <script type="text/template" id="gif-export-desc-template">
     {{description}}
   </script>
 
-  <!-- Template for Gif Export Warning -->
-  <script type="text/template" id="gif-export-warning-template">
+    <!-- Template for Gif Export Warning -->
+    <script type="text/template" id="gif-export-warning-template">
     <div class="gif-export-warning-icon icon-common-warning-red">&nbsp;</div>
     <div class="gif-export-warning-message">
       {{description}}
     </div>
   </script>
 
-  <!-- Template for Gif Export Loop Repeatedly -->
-  <script type="text/template" id="gif-export-loop-repeatedly-template">
+    <!-- Template for Gif Export Loop Repeatedly -->
+    <script type="text/template" id="gif-export-loop-repeatedly-template">
     <input id="gif-repeat-checkbox" class="gif-repeat-checkbox checkbox-fix" type="checkbox" />
     <label for="gif-repeat-checkbox"
            title="{{tooltipTitle}}"
@@ -562,16 +549,16 @@
            data-placement="top">{{label}}</label>
   </script>
 
-  <!-- Template for Gif Export Download and Upload Section -->
-  <script type="text/template" id="gif-export-upload-download-template">
+    <!-- Template for Gif Export Download and Upload Section -->
+    <script type="text/template" id="gif-export-upload-download-template">
     <div class="export-panel-section export-panel-row {{codeDotOrgClass}}" id="{{id}}">
       <button type="button" class="button button-primary {{cssClass}}">{{buttonText}}</button>
       <div class="export-info">{{description}}</div>
     </div>
   </script>
-</div>
+  </div>
   <div style="display:none">
-  <script type="text/template" id="data-uri-export-partial">
+    <script type="text/template" id="data-uri-export-partial">
     <style>
       html, body {
         margin: 0;
@@ -639,10 +626,10 @@
       </div>
     </body>
   </script>
-</div>
+  </div>
 
   <div style="display:none">
-  <script type="text/template" id="popup-preview-partial">
+    <script type="text/template" id="popup-preview-partial">
     <style>
       body,
       .popup-container ,
@@ -704,12 +691,12 @@
       </div>
     </div>
   </script>
-</div>
+  </div>
 
-  <span class="cheatsheet-link icon-common-keyboard-gold"
-        rel="tooltip" data-placement="right" title="Keyboard shortcuts">&nbsp;</span>
-  <div class="performance-link icon-common-warning-red"
-       rel="tooltip" data-placement="left" title="Performance problem detected, learn more.">&nbsp;</div>
+  <span class="cheatsheet-link icon-common-keyboard-gold" rel="tooltip" data-placement="right"
+    title="Keyboard shortcuts">&nbsp;</span>
+  <div class="performance-link icon-common-warning-red" rel="tooltip" data-placement="left"
+    title="Performance problem detected, learn more.">&nbsp;</div>
 
   <!-- dialogs partials -->
   <script type="text/template" id="templates/dialogs/browse-backups.html">
@@ -722,7 +709,7 @@
   </div>
 </script>
 
-<script type="text/template" id="backups-select-session">
+  <script type="text/template" id="backups-select-session">
 <div class="backups-step-container">
   <div class="backups-step-content">
     <div class="browse-backups-disclaimer">
@@ -741,15 +728,15 @@
 </div>
 </script>
 
-<script type="text/template" id="session-list-empty">
+  <script type="text/template" id="session-list-empty">
 <div class="centered-message session-list-empty">No session found ...</div>
 </script>
 
-<script type="text/template" id="session-list-error">
+  <script type="text/template" id="session-list-error">
 <div class="centered-message session-list-error">Could not load backup sessions, something went wrong.</div>
 </script>
 
-<script type="text/template" id="session-list-item">
+  <script type="text/template" id="session-list-item">
 <div class="session-item">
   <div class="session-details">
     <span class="session-details-title">{{name}} {{description}}</span>
@@ -763,7 +750,7 @@
 </div>
 </script>
 
-<script type="text/template" id="backups-session-details">
+  <script type="text/template" id="backups-session-details">
 <div class="backups-step-container">
   <div class="backups-step-content">
     <div class="snapshot-list"></div>
@@ -774,15 +761,15 @@
 </div>
 </script>
 
-<script type="text/template" id="snapshot-list-empty">
+  <script type="text/template" id="snapshot-list-empty">
 <div class="centered-message snapshot-list-empty">No snapshot found ...</div>
 </script>
 
-<script type="text/template" id="snapshot-list-error">
+  <script type="text/template" id="snapshot-list-error">
 <div class="centered-message snapshot-list-error">Could not load snapshots, something went wrong.</div>
 </script>
 
-<script type="text/template" id="snapshot-list-item">
+  <script type="text/template" id="snapshot-list-item">
 <div class="snapshot-item" data-snapshot-id={{id}}>
   <div class="snapshot-preview lowcont-dark-picker-background"></div>
   <div class="snapshot-details">
@@ -816,7 +803,7 @@
   </div>
 </script>
 
-<script type="text/template" id="local-storage-item-template">
+  <script type="text/template" id="local-storage-item-template">
   <tr class="local-piskel-item">
     <td class="local-piskel-name">{{name}}</td>
     <td class="local-piskel-save-date">{{date}}</td>
@@ -866,7 +853,7 @@
   </div>
 </script>
 
-<script type="text/template" id="cheatsheet-shortcut-template">
+  <script type="text/template" id="cheatsheet-shortcut-template">
   <li class="cheatsheet-shortcut {{className}}" data-shortcut-id="{{id}}">
     <div class="cheatsheet-icon {{icon}}"></div>
     <span class="cheatsheet-key" rel="tooltip" data-placement="top" title="{{title}}">{{!key!}}</span>
@@ -948,7 +935,7 @@
   </div>
 </script>
 
-<script type="text/template" id="create-palette-color-template">
+  <script type="text/template" id="create-palette-color-template">
   <li
     class="create-palette-color {{:selected}} {{:light-color}}"
     style="background:{{color}}"
@@ -967,7 +954,7 @@
   </div>
 </script>
 
-<script type="text/template" id="import-image-import">
+  <script type="text/template" id="import-image-import">
 <div class="import-step-container import-image-container">
   <form action="" method="POST" name="import-image-form">
     <div class="import-section">
@@ -1015,7 +1002,7 @@
 </div>
 </script>
 
-<script type="text/template" id="import-select-mode">
+  <script type="text/template" id="import-select-mode">
 <div class="import-step-container">
   <div class="import-info">
     <div class="import-preview"></div>
@@ -1043,7 +1030,7 @@
 </div>
 </script>
 
-<script type="text/template" id="import-meta-content">
+  <script type="text/template" id="import-meta-content">
   <div class="import-name">
     <span class="import-meta-label">Name</span>
     <span class="import-meta-value" title="{{name}}">{{name}}</span>
@@ -1062,7 +1049,7 @@
   </div>
 </script>
 
-<script type="text/template" id="import-adjust-size">
+  <script type="text/template" id="import-adjust-size">
 <div class="import-step-container">
 
   <div class="import-info">
@@ -1084,7 +1071,7 @@
 </div>
 </script>
 
-<script type="text/template" id="import-resize-bigger-partial">
+  <script type="text/template" id="import-resize-bigger-partial">
 <div class="import-resize-bigger">
   <div class="import-resize-section">
     The imported image is bigger than the current sprite.
@@ -1102,7 +1089,7 @@
 </div>
 </script>
 
-<script type="text/template" id="import-resize-smaller-partial">
+  <script type="text/template" id="import-resize-smaller-partial">
 <div class="import-resize-smaller">
   <div class="import-resize-section">
     The image being imported is smaller ({{newSize}}) than the canvas size ({{size}}).
@@ -1110,7 +1097,7 @@
 </div>
 </script>
 
-<script type="text/template" id="import-insert-location">
+  <script type="text/template" id="import-insert-location">
 <div class="import-step-container">
   <div class="import-info">
     <div class="import-preview"></div>
@@ -1244,9 +1231,9 @@
              title="{{title}}">
         </div>
       </script>
-    </div>
   </div>
-</script>
+  </div>
+  </script>
 
   <script type="text/html" id="templates/settings/preferences/misc.html">
   <div class="preferences-panel-misc">
@@ -1351,8 +1338,8 @@
   </div>
 </script>
 
-<!-- save-gallery-partial -->
-<script type="text/template" id="save-gallery-partial">
+  <!-- save-gallery-partial -->
+  <script type="text/template" id="save-gallery-partial">
   <div class="settings-title">Save online</div>
   <div class="settings-item">
     <input type="button" class="button button-primary" id="save-gallery-button" value="Save to your gallery" />
@@ -1360,21 +1347,21 @@
   </div>
 </script>
 
-<script type="text/template" id="save-gallery-warning-partial">
+  <script type="text/template" id="save-gallery-warning-partial">
   <div class="save-status-warning-icon icon-common-warning-red">&nbsp;</div>
   <div class="save-status-warning-text">Saving to the gallery might fail due to the sprite size.</div>
 </script>
 
-<!-- save-gallery-unavailable-partial -->
-<script type="text/template" id="save-gallery-unavailable-partial">
+  <!-- save-gallery-unavailable-partial -->
+  <script type="text/template" id="save-gallery-unavailable-partial">
   <div class="settings-title">Save online</div>
   <div class="settings-item">
     <div class="save-status">Login to <a href="https://www.piskelapp.com" target="_blank">piskelapp.com</a> to save and share your sprites online.</div>
   </div>
 </script>
 
-<!-- save-localstorage-partial -->
-<script type="text/template" id="save-localstorage-partial">
+  <!-- save-localstorage-partial -->
+  <script type="text/template" id="save-localstorage-partial">
   <div class="settings-title">Save offline in Browser</div>
   <div class="settings-item">
     <input type="button" class="button button-primary" id="save-localstorage-button" value="Save in Browser" />
@@ -1382,8 +1369,8 @@
   </div>
 </script>
 
-<!-- save-desktop-partial -->
-<script type="text/template" id="save-desktop-partial">
+  <!-- save-desktop-partial -->
+  <script type="text/template" id="save-desktop-partial">
   <div class="settings-title">Save as File</div>
   <div class="settings-item">
     <input type="button" class="button button-primary" id="save-desktop-button" value="Save" />
@@ -1392,8 +1379,8 @@
   </div>
 </script>
 
-<!-- save-file-download-partial -->
-<script type="text/template" id="save-file-download-partial">
+  <!-- save-file-download-partial -->
+  <script type="text/template" id="save-file-download-partial">
   <div class="settings-title">Save offline as File</div>
   <div class="settings-item">
     <input type="button" class="button button-primary" id="save-file-download-button" value="Save as .piskel" />
@@ -1573,106 +1560,107 @@
   <script type="text/javascript">
     (function () {
 
-  /**
-   * See @Gruntfile.js => after build, -2023-10-24-12-21 is replaced by the build version
-   */
-  var version = '-2023-10-24-12-21';
-  var versionHasNotBeenReplaced = version.indexOf('@@') === 0;
-  if (versionHasNotBeenReplaced)  {
-    version = '';
-  }
+      /**
+       * See @Gruntfile.js => after build, -2023-10-24-12-21 is replaced by the build version
+       */
+      var version = '-2023-10-24-12-21';
+      var versionHasNotBeenReplaced = version.indexOf('@@') === 0;
+      if (versionHasNotBeenReplaced) {
+        version = '';
+      }
 
-  if (!window.piskelReadyCallbacks) {
-    window.piskelReadyCallbacks = [];
-  }
+      if (!window.piskelReadyCallbacks) {
+        window.piskelReadyCallbacks = [];
+      }
 
-  window._onPiskelReady = function () {
-    var loadingMask = document.getElementById('loading-mask');
-    loadingMask.style.opacity = 0;
-    window.setTimeout(function () {loadingMask.parentNode.removeChild(loadingMask);}, 600);
-    pskl.app.init();
-    pskl._releaseVersion = '0.13.0-cdo.12';
-    // cleanup
-    delete window.pskl_exports;
-    delete window.loadDebugScripts;
-    delete window.done;
+      window._onPiskelReady = function () {
+        var loadingMask = document.getElementById('loading-mask');
+        loadingMask.style.opacity = 0;
+        window.setTimeout(function () { loadingMask.parentNode.removeChild(loadingMask); }, 600);
+        pskl.app.init();
+        pskl._releaseVersion = '0.13.0-cdo.12';
+        // cleanup
+        delete window.pskl_exports;
+        delete window.loadDebugScripts;
+        delete window.done;
 
-    // Run Piskel ready callbacks
-    for (var i = 0; i < window.piskelReadyCallbacks.length; i++) {
-      window.piskelReadyCallbacks[i]();
-    }
-  };
+        // Run Piskel ready callbacks
+        for (var i = 0; i < window.piskelReadyCallbacks.length; i++) {
+          window.piskelReadyCallbacks[i]();
+        }
+      };
 
-  var prefixPath = function (path) {
-    if (window.pskl && window.pskl.appEngineToken_) {
-      return '../' + path;
-    } else {
-      return path;
-    }
-  };
+      var prefixPath = function (path) {
+        if (window.pskl && window.pskl.appEngineToken_) {
+          return '../' + path;
+        } else {
+          return path;
+        }
+      };
 
-  var loadScript = function (src, callback) {
-    src = prefixPath(src);
-    var script = window.document.createElement('script');
-    script.setAttribute('src',src);
-    script.setAttribute('onload',callback);
-    window.document.body.appendChild(script);
-  };
+      var loadScript = function (src, callback) {
+        src = prefixPath(src);
+        var script = window.document.createElement('script');
+        script.setAttribute('src', src);
+        script.setAttribute('onload', callback);
+        window.document.body.appendChild(script);
+      };
 
-  var loadStyle = function (src) {
-    src = prefixPath(src);
-    var link = document.createElement('link');
-    link.setAttribute('href', src);
-    link.setAttribute('rel', 'stylesheet');
-    link.setAttribute('type', 'text/css');
-    document.head.appendChild(link);
-  };
+      var loadStyle = function (src) {
+        src = prefixPath(src);
+        var link = document.createElement('link');
+        link.setAttribute('href', src);
+        link.setAttribute('rel', 'stylesheet');
+        link.setAttribute('type', 'text/css');
+        document.head.appendChild(link);
+      };
 
-  if (window.location.href.indexOf('debug') != -1) {
-    window.pskl_exports = {};
-    var scriptIndex = 0;
-    window.loadNextScript = function () {
-      if (scriptIndex == window.pskl_exports.scripts.length) {
-        window._onPiskelReady();
+      if (window.location.href.indexOf('debug') != -1) {
+        window.pskl_exports = {};
+        var scriptIndex = 0;
+        window.loadNextScript = function () {
+          if (scriptIndex == window.pskl_exports.scripts.length) {
+            window._onPiskelReady();
+          } else {
+            loadScript(window.pskl_exports.scripts[scriptIndex], 'loadNextScript()');
+            scriptIndex++;
+          }
+        };
+        loadScript('i18n/i18n.js');
+        loadScript('piskel-script-list.js', 'loadNextScript()');
+
+        var styles;
+        window.loadStyles = function () {
+          styles = window.pskl_exports.styles;
+          for (var i = 0; i < styles.length; i++) {
+            loadStyle(styles[i]);
+          }
+        };
+
+        window.reloadStyles = function () {
+          for (var i = 0; i < styles.length; i++) {
+            document.querySelector('link[href="' + styles[i] + '"]').remove();
+            loadStyle(styles[i]);
+          }
+        };
+
+        loadScript('piskel-style-list.js', 'loadStyles()');
       } else {
-        loadScript(window.pskl_exports.scripts[scriptIndex], 'loadNextScript()');
-        scriptIndex ++;
+        var script;
+        if (window.location.href.indexOf('pack') != -1) {
+          script = 'js/piskel-packaged' + version + '.js';
+        } else {
+          script = 'js/piskel-packaged-min' + version + '.js';
+        }
+
+        loadStyle('css/piskel-style-packaged' + version + '.css');
+        loadScript(script, '_onPiskelReady()');
       }
-    };
-    loadScript('i18n/i18n.js');
-    loadScript('piskel-script-list.js', 'loadNextScript()');
-
-    var styles;
-    window.loadStyles = function () {
-      styles = window.pskl_exports.styles;
-      for (var i = 0 ; i < styles.length ; i++) {
-        loadStyle(styles[i]);
-      }
-    };
-
-    window.reloadStyles = function () {
-      for (var i = 0 ; i < styles.length ; i++) {
-        document.querySelector('link[href="' + styles[i] + '"]').remove();
-        loadStyle(styles[i]);
-      }
-    };
-
-    loadScript('piskel-style-list.js', 'loadStyles()');
-  } else {
-    var script;
-    if (window.location.href.indexOf('pack') != -1) {
-      script = 'js/piskel-packaged' + version + '.js';
-    } else {
-      script = 'js/piskel-packaged-min' + version + '.js';
-    }
-
-    loadStyle('css/piskel-style-packaged' + version + '.css');
-    loadScript(script, '_onPiskelReady()');
-  }
-})();
+    })();
   </script>
   <!--body-main-end-->
   <!-- the comment above indicates the end of the markup reused by the editor integrated in piskelapp.com -->
   <!-- do not delete, do not move :) -->
 </body>
+
 </html>

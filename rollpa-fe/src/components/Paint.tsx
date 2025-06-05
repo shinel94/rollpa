@@ -3,6 +3,7 @@ import Modal from 'react-modal';
 
 // Piskel editor URL (served from backend or public folder)
 const EDITOR_URL = '/piskel/index.html';
+const CELL_IMAGE_SIZE = 256
 
 export interface PaintProps {
   isOpen: boolean;
@@ -13,6 +14,7 @@ export interface PaintProps {
 
 const PaintModal: React.FC<PaintProps> = ({ isOpen, initialData, onSave, onClose }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [image, setImage] = useState<string | undefined>(initialData);
 
   // Listen for messages from iframe
@@ -32,12 +34,12 @@ const PaintModal: React.FC<PaintProps> = ({ isOpen, initialData, onSave, onClose
   }, [handleMessage]);
 
   // When iframe loads, send import data multiple times to ensure Piskel ready
-  const handleIframeLoad = () => {
+  const handleIframeLoad = (imageData?: any) => {
     console.log('[PaintModal] Iframe loaded');
-    if (iframeRef.current && initialData) {
+    if (iframeRef.current && imageData) {
       console.log('test')
       const win = iframeRef.current.contentWindow;
-      const message = { type: 'piskel-import', data: initialData };
+      const message = { type: 'piskel-import', data: imageData };
       console.log('[PaintModal] Sending import to iframe');
       // Send immediately
       win?.postMessage(message, '*');
@@ -63,6 +65,35 @@ const PaintModal: React.FC<PaintProps> = ({ isOpen, initialData, onSave, onClose
     // );
   };
 
+  const handleLoadFile = async (event: any) => {
+    if (event.target) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const imageBitmap = await createImageBitmap(file);
+
+      // Safari 호환 위해 OffscreenCanvas 대신 일반 canvas 사용
+      const canvas = document.createElement('canvas');
+      canvas.width = CELL_IMAGE_SIZE;
+      canvas.height = CELL_IMAGE_SIZE;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return null;
+
+      ctx.drawImage(imageBitmap, 0, 0, CELL_IMAGE_SIZE, CELL_IMAGE_SIZE);
+
+      // PNG로 데이터 URL (Base64)로 변환
+      const dataUrl = canvas.toDataURL('image/png');
+      handleIframeLoad(dataUrl)
+    }
+  }
+
+
+
+  const handleImportClick = () => {
+    // 숨겨진 file input 클릭
+    fileInputRef.current?.click();
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -77,6 +108,17 @@ const PaintModal: React.FC<PaintProps> = ({ isOpen, initialData, onSave, onClose
       }}
     >
       <div style={{ position: 'absolute', bottom: 8, right: '30%', zIndex: 10, display: 'flex', gap: 8 }}>
+
+        <div>
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            onChange={handleLoadFile}
+          />
+          <button onClick={handleImportClick}>import</button>
+        </div>
         <button onClick={handleSaveClick}>Save</button>
         <button onClick={onClose}>Cancel</button>
       </div>
@@ -84,7 +126,7 @@ const PaintModal: React.FC<PaintProps> = ({ isOpen, initialData, onSave, onClose
         ref={iframeRef}
         src={EDITOR_URL}
         title="Piskel Editor"
-        onLoad={handleIframeLoad}
+        onLoad={() => handleIframeLoad(initialData)}
         style={{ width: '100%', height: '100%', border: 'none' }}
       />
     </Modal>
